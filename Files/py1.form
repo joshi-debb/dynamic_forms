@@ -17,10 +17,10 @@ formulario ~>> [
        tipo: "grupo-option",
        valor: "pais",
        valores: ['Guatemala','El Salvador','Honduras']
-     >, 
+     >,
      <
        tipo: "boton",
        valor: "Valor",
        evento: <entrada:>
      >
-] 
+]

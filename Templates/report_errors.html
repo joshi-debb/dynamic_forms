@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+
+    <style>
+      
+      header{
+        background-color: #EE6055;
+        border: 0.1px solid black;
+        padding: 20px 20px;
+        text-align: center;
+        font-weight: bold;
+        width: 80%;
+        border-radius: 20px;
+      }
+
+      body{
+        background-color: #FFD97D;
+        text-align: center;
+        font-family: Arial, Helvetica, sans-serif;
+        font-style: italic;
+        margin: 50px auto;
+      }
+
+      #texto1{
+        font-size: medium;
+        background-color: #eb9234;
+        border: 0.1px solid black;
+        padding: 20px 20px;
+        text-align: center;
+        width: 80%;
+        border-radius: 20px;
+      }
+
+      #texto2{
+        text-align: right;
+        font-size: small;
+        font-weight: bolder;
+        width: 90%;
+      }
+
+      #headtable{
+        text-align: center;
+        font-size: large;
+        font-weight: bolder;
+      }
+      
+      #bodytable{
+        text-align: center;
+        font-size: small;
+        font-weight: lighter;
+
+      }
+
+      #subBody{
+
+        background-color: #e0b653;
+        text-align: center;
+        font-family: Arial, Helvetica, sans-serif;
+        font-style: italic;
+        margin: 50px auto;
+        width: 80%;
+        border-radius: 20px;
+        border: 0.1px solid black;
+      }
+
+      table{
+
+        align-items: center;
+        border: 0.1px solid black;
+        background-color: #60D394;
+        font-style: italic;
+        padding: 20px 20px;
+        width: 80%;
+        border-radius: 20px;
+      }
+
+    </style>
+
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title >Reporte De Errores</title>
+
+  </head>
+  <body>
+
+    <header style="margin: 0 auto">
+    <h1 class="text-center" style="font-size: xx-large;">REPORTE DE ERRORES</h1>
+    </header>
+    <main>
+      
+      <section id = "subBody">
+        <h1 class="text-center">Tabla De Errores</h1>
+        <table style="margin: 0 auto" >
+          <thead >
+            <tr id = "headtable">
+              <th>Lexema:</th>
+              <th>Linea:</th>
+              <th>Columna:</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for Item in errs %}
+            <tr id = "bodytable">
+              <td>{{ Item.char }}</td>
+              <td>{{ Item.line }}</td>
+              <td>{{ Item.col }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </body>
+</html>
