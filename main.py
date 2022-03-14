@@ -14,7 +14,7 @@ class Token:
         self.lexeme: str = lexeme
         self.row: int = row
         self.col: int = col
-    
+
     def show_token(self):
         print('Se ha encontrado el token {} que contiene el lexema {} en la fila {} y columna {}'.format(self.token,self.lexeme,self.row, self.col))
 
@@ -96,11 +96,13 @@ def automata(starter: str):
                 pointer += 1
                 col += 1
 
+        #estado 1 -> simbolos
         elif state == 1:
             state = 0
             tokens.append(Token('simbolo', lexeme, row, col))
             lexeme = ''
 
+        #estado 2 -> reservadas
         elif state == 2:
             if((ord(char) >= 97 and ord(char) <= 122) or ord(char) == 164):
                 pointer += 1
@@ -118,6 +120,7 @@ def automata(starter: str):
                 state = 0
                 lexeme = ''
 
+        #estado 3 -> Strings
         elif state == 3:
             if((ord(char) >= 65 and ord(char) <= 90) or (ord(char) >= 97 and ord(char) <= 122) or ord(char) == 164 or ord(char) == 165  or ord(char) == 45 or ord(char) == 58):
                 state = 5
@@ -148,7 +151,8 @@ def automata(starter: str):
             state = 0
             tokens.append(Token('String', lexeme, row, col))
             lexeme = ''
-
+        
+        #estado 4 -> subStrings
         elif state == 4:
             if((ord(char) >= 65 and ord(char) <= 90) or (ord(char) >= 97 and ord(char) <= 122) or ord(char) == 164 or ord(char) == 165):
                 state = 7
@@ -179,9 +183,7 @@ def automata(starter: str):
             state = 0
             tokens.append(Token('String', lexeme, row, col))
             lexeme = ''
-
     return tuple(tokens), tuple(errores)
-
 
 def process_tokens(tokens):
     env = Environment(loader=FileSystemLoader('Templates/'),
@@ -202,6 +204,16 @@ def process_errors(errs):
     html_file.write(template.render(errs=errs))
     html_file.close()
     startfile('oficial_report_errors.html')
+
+def process_Gui(tokens):
+    env = Environment(loader=FileSystemLoader('Templates/'),
+                    autoescape=select_autoescape(['html']))
+    template = env.get_template('report_gui.html')
+
+    html_file = open('oficial_gui.html', 'w+', encoding='utf-8')
+    html_file.write(template.render(tokens=tokens))
+    html_file.close()
+    startfile('oficial_gui.html')
 
 class display_gui():
     def __init__(self) -> None:
@@ -237,8 +249,6 @@ class display_gui():
     
     def getText_area(self):
         self.text = (self.text_area.get(1.0, tk.END+"-1c"))
-        #for i in self.text:
-        #    print(i)
     
     def clearText_area(self):
         self.text_area.delete("1.0","end")
@@ -255,15 +265,19 @@ class display_gui():
                 self.text_area.insert("1.0", i)
 
     def analyzer(self):
-
+        
         self.getText_area()
         tokens, errs = automata(self.text)
+
         #self.clearText_area()
+
         for i in tokens:
             i.show_token()
         print('<>=<>=<>=<>=<>=<>=<>=<>=<>=<> ERRORES <>=<>=<>=<>=<>=<>=<>=<>=<>=<>')
         for j in errs:
             j.show_errors()
+
+
         if len(self.text) != 0:
             if self.combo_report.get() == 'Reporte de Tokens':
                 process_tokens(tokens)
@@ -271,6 +285,10 @@ class display_gui():
                 process_errors(errs)
         else:
             print('No hay nada que reportar')
+
+        if len(self.text) != 0:
+            #process_Gui(tokens)
+            pass
                 
 if __name__ == '__main__':
     display_gui()
