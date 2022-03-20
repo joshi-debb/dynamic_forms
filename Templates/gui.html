@@ -6,11 +6,11 @@
   <style>
     header {
       background-color: #EE6055;
-      border: 0.1px solid black;
-      padding: 20px 20px;
+      border: 5px solid black;
+      padding: 15px 15px;
       text-align: center;
       font-weight: bold;
-      width: 60%;
+      width: 50%;
       border-radius: 20px;
     }
 
@@ -26,23 +26,49 @@
       background-color: #e0b653;
       text-align: center;
       font-family: Arial, Helvetica, sans-serif;
-      font-style: italic;
+      font-weight: bolder;
       margin: 50px auto;
-      width: 60%;
+      width: 50%;
       border-radius: 20px;
       border: 0.1px solid black;
     }
 
     #panels {
       align-items: center;
-      border: 0.1px solid black;
+      border: 5px solid black;
+      font-family: Arial, Helvetica, sans-serif;
       background-color: #60D394;
-      margin: 50px auto;
-      font-style: italic;
+      margin: 40px auto;
       padding: 20px 20px;
-      width: 60%;
+      width: 75%;
       border-radius: 20px;
     }
+
+    #redondeado {
+      border-radius: 10px;
+      height: 25px;
+      background-color: #a0cdf198;
+    }
+
+    #redondeado2 {
+      border-radius: 10px;
+      border: 1px solid black;
+    }
+
+    
+    #redondeado3 {
+      border-radius: 10px;
+      height: 25px;
+      background-color: #a0cdf198;
+    }
+
+    #redondeado4 {
+      border-radius: 10px;
+      height: 25px;
+      background-color: #fcff4fce;
+    }
+
+
   </style>
 
   <meta charset="UTF-8" />
@@ -55,7 +81,7 @@
 <body>
 
   <header style="margin: 0 auto">
-    <h1 class="text-center" style="font-size: xx-large;">REPORTE DINAMICO</h1>
+    <h1 class="text-center" style="font-size: large;">REPORTE DINAMICO</h1>
   </header>
 
   <main>
@@ -66,36 +92,38 @@
         <section id="subBody">
           <div style="margin: 0 auto" id="panels">
 
-            {% for i in parameters %}
+            
 
+            {% for i in parameters %}
             <p>
               {% if i.tipo == 'etiqueta' %}
               <label>{{ i.valor }}</label>
+              
               {% endif %}
-
+            
               {% if i.tipo == 'texto' %}
-              <input type="text" style="width: 60%;" placeholder="{{ i.fondo }}" value="{{ i.valor }}" />
+              <input id = "redondeado" type="text" style="width: 250px" placeholder="{{ i.fondo }}" value="{{ i.valor }}" />
               {% endif %}
             </p>
+            
 
             <p>
               {% if i.tipo == 'grupo-radio' %}
+              <fieldset id = "redondeado2" >
               <label>{{ i.valor }}:</label>
-            <fieldset>
               {% for genders in i.valores %}
               <label>
-                <input type="radio" value="{{ genders }}"> {{ genders }}
-              </label>
+                <input type="radio" name="genders" value="{{ genders }}"> {{ genders }}</label>
               {% endfor %}
               {% endif %}
-            </fieldset>
+              </fieldset>
             </p>
 
             <p>
               {% if i.tipo == 'grupo-option' %}
               <label>{{ i.valor }}:</label>
-              <select>
-                <optgroup>
+              <select style="width: 175px" id = "redondeado3">
+                <optgroup >
                   {% for country in i.valores %}
                   <option>{{ country }}</option>
                   {% endfor %}
@@ -107,16 +135,17 @@
             <p>
               {% if i.tipo == 'boton' %}
               {% if i.evento == 'entrada' %}
-              <button type="button" class="btn btn-outline-dark" onclick="PressButton1()">{{ i.valor }}</button>
+              <button id = "redondeado4" style="width: 100px" type="button" class="btn btn-outline-dark" onclick="PressButton1()">{{ i.valor }}</button>
               {% endif %}
 
               {% if i.evento == 'info' %}
-              <button onclick="PressButton2()" type="button" class="btn btn-outline-dark">{{ i.valor }}</button>
+              <button id = "redondeado4" style="width: 100px" type="button" class="btn btn-outline-dark" onclick="PressButton1()">{{ i.valor }}</button>
               {% endif %}
               {% endif %}
             </p>
 
             {% endfor %}
+
 
           </div>
         </section>
@@ -126,7 +155,10 @@
 
         <script>
           function PressButton1() {
-
+            var entrada = document.createElement('iframe')
+            entrada.setAttribute('src','OUT_text.html')            
+            entrada.style = 'width: 40%; height: 200px; border: 5px solid black;border-radius: 15px'
+            document.body.appendChild(entrada)
           }
 
           function PressButton2() {

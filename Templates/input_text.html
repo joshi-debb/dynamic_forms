@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+
+    <style>
+      
+      header{
+        background-color: #ee5f55ec;
+        border: 3px solid black;
+        padding: 15px 15px;
+        text-align: center;
+        font-weight: bold;
+        width: 80%;
+        border-radius: 20px;
+      }
+
+      body{
+        background-color: #a0cdf191;
+        text-align: center;
+        font-family: Arial, Helvetica, sans-serif;
+        font-style: italic;
+        margin: 50px auto;
+      }
+
+      #subBody{
+
+        background-color: #fffb27b2;
+        text-align: center;
+        font-family: Arial, Helvetica, sans-serif;
+        margin: 50px auto;
+        width: 80%;
+        border-radius: 20px;
+        border: 3px solid black;
+      }
+
+      #bodytext{
+        text-align: center;
+        font-size: medium;
+        font-weight: lighter;
+        padding: 20px 20px;
+        
+      }
+      
+    </style>
+
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title >Archivo de entrada</title>
+
+  </head>
+  <body>
+
+    <header style="margin: 0 auto">
+    <h1 class="text-center" style="font-size: large;">ARCHIVO DE ENTRADA</h1>
+    </header>
+    <main>
+      
+      <section id = "subBody">
+          <p id = "bodytext">
+            {% for i in text %}
+              {{ i }}
+            {% endfor %}
+          </p>
+      </section>
+    </main>    
+  </body>
+</html>

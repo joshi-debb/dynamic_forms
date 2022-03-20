@@ -1,8 +1,10 @@
+from re import I
 from tkinter import *
 import tkinter as tk
 from tkinter.ttk import Combobox
 from tkinter.filedialog import askopenfilename
 from typing import List
+from click import command
 
 from jinja2 import Environment, select_autoescape
 from jinja2.loaders import FileSystemLoader
@@ -48,6 +50,7 @@ def automata(starter: str):
     errores: List[Errors] = []
     #estado inicial
     state: int = 0
+    tmp_state: int = 0
     #estado actual
     lexeme: str = ''
     #apuntador
@@ -64,6 +67,7 @@ def automata(starter: str):
             #Si el caracter es un simbolo [~>>[]<>,:]
             if(ord(char) == 60 or ord(char) == 62 or ord(char) == 58 or ord(char) == 44 or ord(char) == 91 or ord(char) == 93 or ord(char) == 126):
                 state = 1
+                tmp_state = 1
                 pointer += 1
                 col += 1
                 lexeme += char
@@ -107,12 +111,6 @@ def automata(starter: str):
                 pointer += 1
                 col += 1
 
-        #estado 1 -> simbolos
-        elif state == 1:
-            state = 0
-            tokens.append(Token('simbolo', lexeme, row, col))
-            lexeme = ''
-
         #estado 2 -> reservadas
         elif state == 2:
             if((ord(char) >= 97 and ord(char) <= 122) or ord(char) == 164):
@@ -133,7 +131,7 @@ def automata(starter: str):
 
         #estado 3 -> literal
         elif state == 3:
-            if((ord(char) >= 65 and ord(char) <= 90) or (ord(char) >= 97 and ord(char) <= 122) or ord(char) == 164 or ord(char) == 165  or ord(char) == 45 or ord(char) == 58 or ord(char) == 32):
+            if((ord(char) >= 65 and ord(char) <= 90) or (ord(char) >= 97 and ord(char) <= 122) or ord(char) == 164 or ord(char) == 165):
                 state = 5
                 pointer += 1
                 col += 1
@@ -144,28 +142,17 @@ def automata(starter: str):
                 col += 1
 
         elif state == 5:
-            if((ord(char) >= 65 and ord(char) <= 90) or (ord(char) >= 97 and ord(char) <= 122) or ord(char) == 164 or ord(char) == 165)  or ord(char) == 45 or ord(char) == 58 or ord(char) == 32:
+            if((ord(char) >= 65 and ord(char) <= 90) or (ord(char) >= 97 and ord(char) <= 122) or ord(char) == 164 or ord(char) == 165):
                 pointer += 1
                 col += 1
                 lexeme += char
             elif char == '"':
-                state = 6
+                state = 1
+                tmp_state = 5
                 pointer += 1
                 col += 1
                 lexeme += char
-            else:
-                errores.append(Errors(row, col, char))
-                pointer += 1
-                col += 1
-
-        elif state == 6:
-            state = 0
-            tokens.append(Token('literal', lexeme, row, col))
-            lexeme = ''
-        
-        #estado 4 -> sub literal
-        elif state == 4:
-            if((ord(char) >= 65 and ord(char) <= 90) or (ord(char) >= 97 and ord(char) <= 122) or ord(char) == 164 or ord(char) == 165) or ord(char) == 32:
+            elif ord(char) == 45 or ord(char) == 58 or ord(char) == 32:
                 state = 7
                 pointer += 1
                 col += 1
@@ -176,11 +163,42 @@ def automata(starter: str):
                 col += 1
 
         elif state == 7:
-            if((ord(char) >= 65 and ord(char) <= 90) or (ord(char) >= 97 and ord(char) <= 122) or ord(char) == 164 or ord(char) == 165) or ord(char) == 32:
+            if((ord(char) >= 65 and ord(char) <= 90) or (ord(char) >= 97 and ord(char) <= 122) or ord(char) == 164 or ord(char) == 165):
+                pointer += 1
+                col += 1
+                lexeme += char
+            elif char == '"':
+                state = 1
+                tmp_state = 7
+                pointer += 1
+                col += 1
+                lexeme += char
+
+
+        #estado 4 -> subliteral
+        elif state == 4:
+            if((ord(char) >= 65 and ord(char) <= 90) or (ord(char) >= 97 and ord(char) <= 122) or ord(char) == 164 or ord(char) == 165):
+                state = 6
+                pointer += 1
+                col += 1
+                lexeme += char
+            else:
+                errores.append(Errors(row, col, char))
+                pointer += 1
+                col += 1
+
+        elif state == 6:
+            if((ord(char) >= 65 and ord(char) <= 90) or (ord(char) >= 97 and ord(char) <= 122) or ord(char) == 164 or ord(char) == 165):
                 pointer += 1
                 col += 1
                 lexeme += char
             elif char == "'":
+                state = 1
+                tmp_state = 6
+                pointer += 1
+                col += 1
+                lexeme += char
+            elif ord(char) == 45 or ord(char) == 58 or ord(char) == 32:
                 state = 8
                 pointer += 1
                 col += 1
@@ -191,17 +209,44 @@ def automata(starter: str):
                 col += 1
 
         elif state == 8:
-            state = 0
-            tokens.append(Token('subliteral', lexeme, row, col))
-            lexeme = ''
+            if((ord(char) >= 65 and ord(char) <= 90) or (ord(char) >= 97 and ord(char) <= 122) or ord(char) == 164 or ord(char) == 165):
+                pointer += 1
+                col += 1
+                lexeme += char
+            elif char == "'":
+                state = 1
+                tmp_state = 8
+                pointer += 1
+                col += 1
+                lexeme += char
+
+        #estado 1 -> Aceptacion General
+        elif state == 1:
+            if tmp_state == 5 or tmp_state == 7:
+                state = 0
+                tmp_state = 0
+                tokens.append(Token('literal', lexeme, row, col))
+                lexeme = ''
+            elif tmp_state == 6 or tmp_state == 8:
+                state = 0
+                tmp_state = 0
+                tokens.append(Token('subliteral', lexeme, row, col))
+                lexeme = ''
+            elif tmp_state == 1:
+                state = 0
+                tmp_state = 0
+                tokens.append(Token('simbolo', lexeme, row, col))
+                lexeme = ''
+
     return tuple(tokens), tuple(errores)
 
-def parser(tokens: List[Token]):
+def scanner(tokens: List[Token]):
     list_parameters: List[HTML_GUI] = []
     tmp_parameters: list = []
     html_gui: list = []
-
     tmp_parameters.append(html_gui)
+    tmp = ''
+    tmp2 = " "
     for i in range(len(tokens)):
         if tokens[i].token == 'simbolo' and tokens[i].lexeme == '<':
             new_html_gui: list = []
@@ -215,19 +260,37 @@ def parser(tokens: List[Token]):
             # extraer tipo
             for i in range(len(html_gui)):
                 if html_gui[i].token == 'reservada' and html_gui[i].lexeme == 'tipo' and html_gui[i+1].token == 'simbolo' and html_gui[i+1].lexeme == ':' and html_gui[i+2].token == 'literal' and (html_gui[i+3].token == 'reservada' or html_gui[i+3].token == 'simbolo'):
-                    params.tipo = html_gui[i + 2].lexeme.replace('"', '')
+                    for tmp_tipo in html_gui[i + 2].lexeme:
+                        if tmp_tipo == '"':
+                            tmp_tipo = tmp2
+                        else:
+                            tmp += tmp_tipo
+                    params.tipo = tmp
+                    tmp = ''
                     break
 
             # extraer valor
             for j in range(len(html_gui)):
                 if html_gui[j].token == 'reservada' and html_gui[j].lexeme == 'valor' and html_gui[j+1].token == 'simbolo' and html_gui[j+1].lexeme == ':' and html_gui[j+2].token == 'literal' and (html_gui[j+3].token == 'reservada' or html_gui[j+3].token == 'simbolo'):
-                    params.valor = html_gui[j + 2].lexeme.replace('"', '')
+                    for tmp_valor in html_gui[j + 2].lexeme:
+                        if tmp_valor == '"':
+                            tmp_valor = tmp2
+                        else:
+                            tmp += tmp_valor
+                    params.valor = tmp
+                    tmp = ''
                     break
 
             # extraer fondo
             for k in range(len(html_gui)):
                 if html_gui[k].token == 'reservada' and html_gui[k].lexeme == 'fondo' and html_gui[k+1].token == 'simbolo' and html_gui[k+1].lexeme == ':' and html_gui[k+2].token == 'literal' and (html_gui[k+3].token == 'reservada' or html_gui[k+3].token == 'simbolo'):
-                    params.fondo = html_gui[k + 2].lexeme.replace('"', '')
+                    for tmp_fondo in html_gui[k + 2].lexeme:
+                        if tmp_fondo == '"':
+                            tmp_fondo = tmp2
+                        else:
+                            tmp += tmp_fondo
+                    params.fondo = tmp
+                    tmp = ''
                     break
             
             # extraer evento
@@ -256,10 +319,14 @@ def parser(tokens: List[Token]):
                 auxlist: List[str] = []
                 for i in range(len(list)):
                     if list[i].token == 'subliteral':
-                        auxlist.append(list[i].lexeme.replace("'",""))
-
+                        for tmp_subliteral in list[i].lexeme:
+                            if tmp_subliteral == "'":
+                                tmp_subliteral = tmp2
+                            else:
+                                tmp += tmp_subliteral
+                        auxlist.append(tmp)
+                        tmp = ''
             params.valores = auxlist
-
             list_parameters.append(params)
         return list_parameters
     except:
@@ -294,6 +361,14 @@ def process_Gui(parameters):
     html_file.close()
     startfile('oficial_gui.html')
 
+def process_input(text):
+    env = Environment(loader=FileSystemLoader('Templates/'),
+                    autoescape=select_autoescape(['html']))
+    template = env.get_template('input_text.html')
+    html_file = open('OUT_text.html', 'w+', encoding='utf-8')
+    html_file.write(template.render(text=text))
+    html_file.close()
+
 class display_gui():
     def __init__(self) -> None:
         self.root = tk.Tk()
@@ -311,7 +386,7 @@ class display_gui():
         self.lbl_combo = Label(self.frame, text="Reportes")
         self.lbl_combo.place(x=540, y=30)
 
-        self.combo_report = Combobox(self.frame,values=['Reporte de Tokens', 'Reporte de Errores', 'Manual de Usuario', 'Manual Tecnico'])
+        self.combo_report = Combobox(self.frame, values=['Reporte de Tokens', 'Reporte de Errores', 'Manual de Usuario', 'Manual Tecnico'])
         self.combo_report.place(x=500, y=50)
 
         self.text_area = Text(self.frame,  height = 15, width = 80)
@@ -332,7 +407,6 @@ class display_gui():
     def clearText_area(self):
         self.text_area.delete("1.0","end")
 
-
     def load_file(self):
         try:
             filename = askopenfilename()
@@ -349,22 +423,24 @@ class display_gui():
         self.getText_area()
         tokens, errs = automata(self.text)
 
+        process_input(self.text)
+
         #print(self.text)
+        parameters = scanner(tokens)
 
-        parameters = parser(tokens)
-    
-        for i in parameters:
-            i.show_guis()
+        if parameters != None:
+            for i in parameters:
+                i.show_guis()
+            process_Gui(parameters)
+        else:
+            print('No hay parametros para la GUI')
         
-        process_Gui(parameters)
-
-        '''''
-        for i in asdf:
+        for i in tokens:
             i.show_token()
         print('<>=<>=<>=<>=<>=<>=<>=<>=<>=<> ERRORES <>=<>=<>=<>=<>=<>=<>=<>=<>=<>')
         for j in errs:
             j.show_errors()
-        '''''
+
         if len(self.text) != 0:
             if self.combo_report.get() == 'Reporte de Tokens':
                 process_tokens(tokens)
@@ -372,6 +448,6 @@ class display_gui():
                 process_errors(errs)
         else:
             print('No hay nada que reportar')
-        
+
 if __name__ == '__main__':
     display_gui()
