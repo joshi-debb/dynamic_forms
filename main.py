@@ -1,15 +1,15 @@
-from re import I
 from tkinter import *
 import tkinter as tk
 from tkinter.ttk import Combobox
 from tkinter.filedialog import askopenfilename
 from typing import List
-from click import command
 
 from jinja2 import Environment, select_autoescape
 from jinja2.loaders import FileSystemLoader
-
+ 
 from os import startfile
+import webbrowser
+
 
 class Token:
     def __init__(self, token: str, lexeme: str, row: int, col: int) -> None:
@@ -397,6 +397,9 @@ class display_gui():
 
         self.btn_clear = Button(self.frame,text="Limpiar", command=self.clearText_area)
         self.btn_clear.place(x=590, y=350)
+        
+        self.btn_clear = Button(self.frame,text="Go", command=self.print_report)
+        self.btn_clear.place(x=645, y=47)
 
         self.root.resizable(0,0)
         self.root.mainloop()
@@ -433,21 +436,42 @@ class display_gui():
                 i.show_guis()
             process_Gui(parameters)
         else:
-            print('No hay parametros para la GUI')
+            print(' > No hay parametros para la GUI')
         
-        for i in tokens:
-            i.show_token()
-        print('<>=<>=<>=<>=<>=<>=<>=<>=<>=<> ERRORES <>=<>=<>=<>=<>=<>=<>=<>=<>=<>')
-        for j in errs:
-            j.show_errors()
+        if len(tokens) != 0:
+            for i in tokens:
+                i.show_token()
+        else:
+            print(' > No hay tokens')
+        if len(errs) != 0:
+            print('<>=<>=<>=<>=<>=<>=<>=<>=<>=<> ERRORES <>=<>=<>=<>=<>=<>=<>=<>=<>=<>')
+            for j in errs:
+                j.show_errors()
+        else:
+            print(' > No hay errores')
+
+    def print_report(self):
+
+        if self.combo_report.get() == 'Manual de Usuario':
+            print(' > Manual de Usuario')
+            webbrowser.open_new('Docs\\Usuario.pdf')
+
+        if self.combo_report.get() == 'Manual Tecnico':
+            print(' > Manual Tecnico')
+            webbrowser.open_new('Docs\\Tecnico.pdf')
+
+        self.getText_area()
+        tokens, errs = automata(self.text)
 
         if len(self.text) != 0:
             if self.combo_report.get() == 'Reporte de Tokens':
+                print(' > Reporte de Tokens')
                 process_tokens(tokens)
             elif self.combo_report.get() == 'Reporte de Errores':
+                print(' > Reporte de Errores')
                 process_errors(errs)
         else:
-            print('No hay nada que reportar')
-
+            print(' > No hay nada que reportar')
+        
 if __name__ == '__main__':
     display_gui()
